@@ -1,0 +1,31 @@
+##******************************************************************
+##                      Familienduell                              *
+##          Fragen und häufigste Antworten der Gäste               *
+##******************************************************************
+#
+# Eine neue Frage beginnt mit dem Keyword BLOCK und der Nummer der
+# Frage.
+# Die erste Zeile mit 0 beginnend beinhaltet die Frage, die
+# darauffolgenden Zeilen beinhalten die Antworten.
+# Erste Spalte: Nummern der Frage/Antworten.
+# Zweite Spalte: Punkte für die richtige Antwort.
+# Dritte Spalte: Frage/Antworten.
+#
+# Die Blöcke müssen durch Rautezeichen '#' getrennt werden, welche
+# auch als Einleitung eines Kommentars dienen. Alles was
+# hinter einem '#' steht wird vom Programm ignoriert.
+#
+BLOCK 0
+     0   Das steckt man beim Gewitter aus.
+     1   70   Fernseher
+     2   20   Telefon
+     3    5   Computer
+     4    5   Stereoanlage
+#
+BLOCK 1
+     0   Nennen Sie ein Tier mit Geweih.
+     1   80   Reh
+     2   10   Elefant
+     3    7   Gazelle
+     4    3   Nashorn
+#

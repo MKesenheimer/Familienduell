@@ -48,16 +48,16 @@ INCLUDE = $(wildcard *.h $(UINCLUDE)/*.h)
 	$(CXX) -c -o build/$@ $<
 
 # Libraries
-LIB =
+LIB = -lncurses
 
 # Frameworks
-FRM =
+FRM = -framework SDL2 -framework SDL2_image -framework SDL2_gfx -framework SDL2_ttf -framework Cocoa
 
 ########################################################################
 ## Linker files
 
 ### USER Files ###
-USER = Familienduell.a
+USER = Familienduell.a Interface.a Functions.a Timer.a
 
 ########################################################################
 ## Rules
