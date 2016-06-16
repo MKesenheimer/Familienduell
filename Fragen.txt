@@ -21,11 +21,13 @@ BLOCK 0
      2   20   Telefon
      3    5   Computer
      4    5   Stereoanlage
+     5    0   Wasserhahn
 #
 BLOCK 1
      0   Nennen Sie ein Tier mit Geweih.
      1   80   Reh
      2   10   Elefant
      3    7   Gazelle
-     4    3   Nashorn
+     4    2   Nashorn
+     5    1   Schlange
 #
