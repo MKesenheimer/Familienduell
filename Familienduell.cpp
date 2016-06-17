@@ -38,7 +38,7 @@ const int NUMBER_OF_COLUMNS = 20;
 const int FRAMES_PER_SECOND = 30;
 
  //TODO, verallgemeinern!
-const int NUMBER_OF_QUESTIONS = 2;
+const int NUMBER_OF_QUESTIONS = 3;
 const int NUMBER_OF_ANSWERS = 5;
 
 
@@ -93,17 +93,17 @@ void renderText(const std::string &message, const std::string &fontFile,
 
 	TTF_Font *font = TTF_OpenFont(fontFile.c_str(), fontSize);
     if(font == nullptr) {
-        std::cout<<"Error 1 in rencerText.";
+        std::cout<<"Error 1 in renderText.";
     }
     
 	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, message.c_str(), color);
     if(surf == nullptr) {
-        std::cout<<"Error 2 in rencerText.";
+        std::cout<<"Error 2 in renderText.";
     }
     
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
     if(texture == nullptr) {
-        std::cout<<"Error 3 in rencerText.";
+        std::cout<<"Error 3 in renderText.";
     }
     
     SDL_SetTextureAlphaMod(texture, alpha);
@@ -121,17 +121,17 @@ void renderText(const std::string &message, const std::string &fontFile,
 
 	TTF_Font *font = TTF_OpenFont(fontFile.c_str(), fontSize);
     if(font == nullptr) {
-        std::cout<<"Error 1 in rencerText.";
+        std::cout<<"Error 1 in renderText.";
     }
     
 	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, message.c_str(), color);
     if(surf == nullptr) {
-        std::cout<<"Error 2 in rencerText.";
+        std::cout<<"Error 2 in renderText.";
     }
     
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
     if(texture == nullptr) {
-        std::cout<<"Error 3 in rencerText.";
+        std::cout<<"Error 3 in renderText.";
     }
     
     renderTexture(texture, renderer, x, y);
@@ -182,6 +182,7 @@ int main(int argc, char* args[]) {
     //Gamelogic
     bool showSplash = true;
     bool showMain = false;
+    bool showEnd = false;
     bool displayText = false;
     std::string dText = std::string();
     int currentQuestion = 0;
@@ -237,7 +238,7 @@ int main(int argc, char* args[]) {
                 quit = true;
                 break;
             case SDL_KEYDOWN:
-                //SDL_RaiseWindow(windowTerminal);
+                SDL_RaiseWindow(windowTerminal);
                 switch(e.key.keysym.sym) {
                 case SDLK_ESCAPE:
                     toggleFullscreen(windowMain, rendererMain);
@@ -271,21 +272,53 @@ int main(int argc, char* args[]) {
                             if(commandVec[0].compare("exit") == 0) {
                                 quit = true;
                             }
-                            if(commandVec[0].compare("next") == 0) {
-                                currentQuestion++;
-                                if(currentQuestion<0) currentQuestion = 0;
-                                nWrongA = 0; nWrongB = 0;
-                                points = 0;
-                                for(int i=0; i<=NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
-                            }
-                            if(commandVec[0].compare("previous") == 0) {
-                                currentQuestion--;
+                            if(commandVec[0].compare("next") == 0 and showMain) {
                                 if(currentQuestion>=NUMBER_OF_QUESTIONS) currentQuestion = NUMBER_OF_QUESTIONS-1;
+                                if(currentQuestion<(NUMBER_OF_QUESTIONS-1)) {
+                                    currentQuestion++;
+                                    //take the points 
+                                    if(currentGroup.compare("A") == 0 and nWrongA<3) {
+                                        pointsA += points;
+                                    } else if(currentGroup.compare("B") == 0 and nWrongB<3) {
+                                        pointsB += points;
+                                    }
+                                    nWrongA = 0; nWrongB = 0;
+                                    points = 0;
+                                    for(int i=0; i<=NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
+                                //end of game
+                                } else {
+                                    currentQuestion = NUMBER_OF_QUESTIONS;
+                                    showEnd = true;
+                                    showMain = false;
+                                    showSplash = false;
+                                    displayText = false;
+                                }
+                            }
+                            //the previous command works only in main screen
+                            if(commandVec[0].compare("previous") == 0) {
+                                if(currentQuestion<=0) currentQuestion = 0;
+                                if(currentQuestion>0) {
+                                    currentQuestion--;
+                                    for(int i=0; i<=NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
+                                    nWrongA = 0; nWrongB = 0;
+                                    points = 0;
+                                    showSplash = false;
+                                    showMain = true;
+                                    displayText = false;
+                                    showEnd = false;
+                                }
                             }
                             if(commandVec[0].compare("start") == 0) {
                                 showSplash = false;
                                 showMain = true;
                                 displayText = false;
+                                showEnd = false;
+                            }
+                            if(commandVec[0].compare("end") == 0) {
+                                showSplash = false;
+                                showMain = false;
+                                displayText = false;
+                                showEnd = true;
                             }
                             if(commandVec[0].compare("set") == 0) {
                                 if(commandVec[1].compare("A") == 0 or commandVec[1].compare("B") == 0) {
@@ -296,7 +329,7 @@ int main(int argc, char* args[]) {
                                 if(is_number(commandVec[1])) {
                                     std::string::size_type sz;
                                     int n = std::stoi(commandVec[1],&sz);
-                                    if(n>0 and n<=NUMBER_OF_ANSWERS) {
+                                    if(n>0 and n<=NUMBER_OF_ANSWERS and (nWrongA<3 or nWrongB<3)) {
                                         showAnswer[n] = true;
                                         points += interface.getAnswerPoints(currentQuestion,n);
                                     }
@@ -306,12 +339,31 @@ int main(int argc, char* args[]) {
                                         if(!showAnswer[i]) showAnswer[0] = false;
                                     }
                                     //take the points
-                                    if(showAnswer[0] && currentGroup.compare("A") == 0) {
+                                    if(showAnswer[0] && currentGroup.compare("A") == 0 and nWrongA<3) {
                                         pointsA += points;
                                         points = 0;
-                                    } else if(showAnswer[0] && currentGroup.compare("B") == 0) {
+                                    } else if(showAnswer[0] && currentGroup.compare("B") == 0 and nWrongB<3) {
                                         pointsB += points;
                                         points = 0;
+                                    }
+                                    //if group A has three wrong answers, it's group B's turn
+                                    //if group B (correctly) reveals one answer, they steal the points of group A
+                                    if(nWrongA>=3 and nWrongB<3) {
+                                        pointsB += points;
+                                        points = 0;
+                                    } else if(nWrongB>=3 and nWrongA<3) {
+                                        pointsA += points;
+                                        points = 0;
+                                    }
+                                }
+                            }
+                            if(commandVec[0].compare("hide") == 0) {
+                                if(is_number(commandVec[1])) {
+                                    std::string::size_type sz;
+                                    int n = std::stoi(commandVec[1],&sz);
+                                    if(n>0 and n<=NUMBER_OF_ANSWERS and (nWrongA<3 or nWrongB<3)) {
+                                        showAnswer[n] = false;
+                                        points -= interface.getAnswerPoints(currentQuestion,n);
                                     }
                                 }
                             }
@@ -323,6 +375,8 @@ int main(int argc, char* args[]) {
                                 pointsA = 0; pointsB = 0;
                                 points = 0;
                                 for(int i=0; i<=NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
+                                nWrongA = 0; nWrongB = 0;
+                                showEnd = false;
                             }
                             if(commandVec[0].compare("display") == 0) {
                                 //TODO: save previous state and get back to it with command "back"
@@ -330,6 +384,7 @@ int main(int argc, char* args[]) {
                                 displayText = true;
                                 showSplash = false;
                                 showMain = false;
+                                showEnd = false;
                             }
                             if(showMain && commandVec[0].compare("wrong") == 0) {
                                 if(currentGroup.compare("A") == 0 && commandVec[1].compare("A") == 0) {
@@ -344,6 +399,9 @@ int main(int argc, char* args[]) {
                                         nWrongB = 3;
                                         currentGroup = "A";
                                     }
+                                }
+                                if(nWrongB>=3 and nWrongA>=3) {
+                                    points = 0;
                                 }
                             }
                             if(showMain && commandVec[0].compare("add") == 0) {
@@ -602,6 +660,35 @@ int main(int argc, char* args[]) {
             textMain = dText;
             renderText(textMain, "lazy.ttf", colorGreen, 3*height/NUMBER_OF_LINES, rendererMain, 
                         1*width/NUMBER_OF_COLUMNS, 3*height/NUMBER_OF_LINES);
+        }
+        
+        if(showEnd) {
+            textMain = "Alles Gute!";
+            renderText(textMain, "lazy.ttf", colorGreen, 2*height/NUMBER_OF_LINES, rendererMain, 
+                        2*width/NUMBER_OF_COLUMNS, 2*height/NUMBER_OF_LINES);
+            textMain = "wünschen euch:";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+                        2.5*width/NUMBER_OF_COLUMNS, 5*height/NUMBER_OF_LINES);
+            textMain = "Jenny, Matze, Kadda, Johannes,";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+                        2.5*width/NUMBER_OF_COLUMNS, 6*height/NUMBER_OF_LINES);
+            textMain = "Saby, Tobby, Dennis, ";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+                        2.5*width/NUMBER_OF_COLUMNS, 7*height/NUMBER_OF_LINES);
+            textMain = "Simon, Teresa, Simi, Benni,";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+                        2.5*width/NUMBER_OF_COLUMNS, 8*height/NUMBER_OF_LINES);
+            textMain = "Thessy, Benni, Ute, Salome, Manu,";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+                        2.5*width/NUMBER_OF_COLUMNS, 9*height/NUMBER_OF_LINES);
+            textMain = "David, Sissi, Sarah und Matthias";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+                        2.5*width/NUMBER_OF_COLUMNS, 10*height/NUMBER_OF_LINES);
+                        
+            //Werbung
+            textMain = "(C++ Code frei erhältlich unter https://github.com/MKesenheimer/Familienduell)";
+            renderText(textMain, "lazy.ttf", colorGreen, 0.4*height/NUMBER_OF_LINES, rendererMain, 
+                        2*width/NUMBER_OF_COLUMNS, 12*height/NUMBER_OF_LINES);
         }
         
         //apply to the screen

@@ -31,3 +31,11 @@ BLOCK 1
      4    2   Nashorn
      5    1   Schlange
 #
+BLOCK 2
+     0   Instrumente des Posaunenchors.
+     1   70   Posaune
+     2   13   Trompete
+     3    8   Tuba
+     4    6   Horn
+     5    3   Orgel
+#
