@@ -40,3 +40,103 @@ std::string readNextString(std::string str, std::size_t *pos) {
     }
     return temp;
 }
+
+//toggle full screen
+void toggleFullscreen(SDL_Window *window, SDL_Renderer *renderer) {
+        Uint32 flags(SDL_GetWindowFlags(window));
+        flags ^= SDL_WINDOW_FULLSCREEN_DESKTOP;
+        SDL_SetWindowFullscreen(window, flags);
+        if((flags & SDL_WINDOW_FULLSCREEN_DESKTOP) != 0) {
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+            SDL_RenderSetLogicalSize(renderer, FULLSCREEN_WIDTH, FULLSCREEN_HEIGHT);
+        } else {
+            SDL_SetWindowSize(window, SCREEN_WIDTH, SCREEN_HEIGHT);
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+            SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+}
+
+//Draw an SDL_Texture to an SDL_Renderer at position x, y, with some desired
+//width and height
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y, int w, int h) {
+	//Setup the destination rectangle to be at the position we want
+	SDL_Rect dst;
+	dst.x = x;
+	dst.y = y;
+	dst.w = w;
+	dst.h = h;
+	SDL_RenderCopy(ren, tex, NULL, &dst);
+}
+
+//Draw an SDL_Texture to an SDL_Renderer at position x, y, preserving
+//the texture's width and height
+void renderTexture(SDL_Texture *tex, SDL_Renderer *ren, int x, int y) {
+	int w, h;
+	SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+	renderTexture(tex, ren, x, y, w, h);
+}
+
+void renderSurface(SDL_Renderer *ren, SDL_Surface *surf, int x, int y) {
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surf);
+	if (texture == nullptr) {
+        std::cout<<"Error in renderText."<<std::endl;
+		SDL_FreeSurface(surf);
+	}
+    renderTexture(texture, ren, x, y);
+    SDL_DestroyTexture(texture);
+}
+
+//Render text
+void renderText(const std::string &message, const std::string &fontFile,
+	SDL_Color color, int alpha, int fontSize, SDL_Renderer *renderer, int x, int y) {
+
+	TTF_Font *font = TTF_OpenFont(fontFile.c_str(), fontSize);
+    if(font == nullptr) {
+        std::cout<<"Error 1 in renderText.";
+    }
+    
+	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, message.c_str(), color);
+    if(surf == nullptr) {
+        std::cout<<"Error 2 in renderText.";
+    }
+    
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
+    if(texture == nullptr) {
+        std::cout<<"Error 3 in renderText.";
+    }
+    
+    SDL_SetTextureAlphaMod(texture, alpha);
+    renderTexture(texture, renderer, x, y);
+    
+	//Clean up the surface and font
+	SDL_FreeSurface(surf);
+	TTF_CloseFont(font);
+    SDL_DestroyTexture(texture);
+}
+
+//Render text (without alpha blending)
+void renderText(const std::string &message, const std::string &fontFile,
+	SDL_Color color, int fontSize, SDL_Renderer *renderer, int x, int y) {
+
+	TTF_Font *font = TTF_OpenFont(fontFile.c_str(), fontSize);
+    if(font == nullptr) {
+        std::cout<<"Error 1 in renderText.";
+    }
+    
+	SDL_Surface *surf = TTF_RenderUTF8_Blended(font, message.c_str(), color);
+    if(surf == nullptr) {
+        std::cout<<"Error 2 in renderText.";
+    }
+    
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surf);
+    if(texture == nullptr) {
+        std::cout<<"Error 3 in renderText.";
+    }
+    
+    renderTexture(texture, renderer, x, y);
+    
+	//Clean up the surface and font
+	SDL_FreeSurface(surf);
+	TTF_CloseFont(font);
+    SDL_DestroyTexture(texture);
+}

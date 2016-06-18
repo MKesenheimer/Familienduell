@@ -51,7 +51,7 @@ INCLUDE = $(wildcard *.h $(UINCLUDE)/*.h)
 LIB = -lncurses
 
 # Frameworks
-FRM = -framework SDL2 -framework SDL2_image -framework SDL2_gfx -framework SDL2_ttf -framework Cocoa
+FRM = -framework SDL2 -framework SDL2_image -framework SDL2_gfx -framework SDL2_ttf -framework SDL2_mixer -framework Cocoa
 
 ########################################################################
 ## Linker files
