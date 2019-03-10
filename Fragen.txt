@@ -8,34 +8,108 @@
 # Die erste Zeile mit 0 beginnend beinhaltet die Frage, die
 # darauffolgenden Zeilen beinhalten die Antworten.
 # Erste Spalte: Nummern der Frage/Antworten.
-# Zweite Spalte: Punkte für die richtige Antwort.
-# Dritte Spalte: Frage/Antworten.
+# Zweite Spalte: Punkte für die richtige Antwort, bzw, Frage
+# Dritte Spalte: Antworten.
 #
 # Die Blöcke müssen durch Rautezeichen '#' getrennt werden, welche
 # auch als Einleitung eines Kommentars dienen. Alles was
 # hinter einem '#' steht wird vom Programm ignoriert.
 #
 BLOCK 0
-     0   Das steckt man beim Gewitter aus.
-     1   70   Fernseher
-     2   20   Telefon
-     3    5   Computer
-     4    5   Stereoanlage
-     5    0   Wasserhahn
+     0  Ein Tier, das auf dem Bauernhof lebt:
+     1   25   Kuh
+     2    3   Huhn
+     3    3   Katze
+     4    2   Schwein
 #
 BLOCK 1
-     0   Nennen Sie ein Tier mit Geweih.
-     1   80   Reh
-     2   10   Elefant
-     3    7   Gazelle
-     4    2   Nashorn
-     5    1   Schlange
+     0   Eine gelbe Frucht:
+     1   19   Banane
+     2   16   Zitrone
+     3    1   Gelbe Rübe
+     4    1   Mango
 #
 BLOCK 2
-     0   Instrumente des Posaunenchors.
-     1   70   Posaune
-     2   13   Trompete
-     3    8   Tuba
-     4    6   Horn
-     5    3   Orgel
+     0   Ein Hobby von dir:
+     1   16   Musik
+     2   14   Sport
+     3    4   Lesen
+     4    2   Basteln
+#
+BLOCK 3
+     0   Das schönste Blechblasinstrument:
+     1   13   Posaune
+     2   11   Trompete
+     3    9   Horn
+     4    3   Euphonium
+#
+BLOCK 4
+     0   Dein Lieblingsgericht:
+     1    6   Pizza
+     2    5   Linsen mit Spätzle
+     3    4   Spaghetti
+     4    4   Lasagne
+#
+BLOCK 5
+     0   Eine Automarke: 
+     1   10   Audi
+     2    7   BMW
+     3    6   VW
+     4    6   Mercedes
+#
+BLOCK 6
+     0   Etwas, wofür Mössingen bekannt ist:
+     1   20   Blumen
+     2    5   Bergrutsch
+     3    3   Schnaps
+     4    3   Streuobstwiesen
+#
+BLOCK 7
+     0    Dein Lieblingsgetränk:
+     1    8   Kaffee
+     2    7   Bier
+     3    5   Cola
+     4    5   Saftschorle
+#
+BLOCK 8
+     0   Gegenstände in der Probe:
+     1   15   Notenständer
+     2    6   Noten
+     3    4   Notentasche
+     4    3   Mundstück
+#
+BLOCK 9
+     0   Dein Lieblingsweihnachtslied:
+     1   11   Ich steh an deiner Krippe hier
+     2    7   Tochter Zion
+     3    5   Oh du fröhliche
+     4    2   Macht hoch die Tür
+#
+BLOCK 10
+     0   Dein Lieblingsheft:
+     1   10   Choralfantasien
+     2    5   BLM 2013
+     3    5   Bläserklänge
+     4    2   Das Einblasheft
+#
+BLOCK 11
+     0   Einen Schnaps, den du gerne trinkst:
+     1   10   Kirsche
+     2    8   Birne
+     3    7   keinen
+     4    2   Mirabelle
+#
+BLOCK 12
+     0   Eigenschaft eines Dirigenten:
+     1   16   Geduld
+     2    7   Nerven
+     3    3   Taktgefühl
+     4    2   Humor
+#
+BLOCK 13
+     0   Oft gespielte Komponisten:
+     1   18   Johann S. Bach
+     2    9   Christian Sprenger
+     3    3   Nonnenmann
+     4    2   Michael Schütz
 #

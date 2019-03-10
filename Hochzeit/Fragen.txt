@@ -1,0 +1,59 @@
+##******************************************************************
+##                      Familienduell                              *
+##          Fragen und häufigste Antworten der Gäste               *
+##******************************************************************
+#
+# Eine neue Frage beginnt mit dem Keyword BLOCK und der Nummer der
+# Frage.
+# Die erste Zeile mit 0 beginnend beinhaltet die Frage, die
+# darauffolgenden Zeilen beinhalten die Antworten.
+# Erste Spalte: Nummern der Frage/Antworten.
+# Zweite Spalte: Punkte für die richtige Antwort, bzw, Frage
+# Dritte Spalte: Antworten.
+#
+# Die Blöcke müssen durch Rautezeichen '#' getrennt werden, welche
+# auch als Einleitung eines Kommentars dienen. Alles was
+# hinter einem '#' steht wird vom Programm ignoriert.
+#
+BLOCK 0
+     0  Etwas für das Mössingen bekannt ist:
+     1   25   Blumen
+     2    9   Bergrutsch
+     3    6   Streuobstwiesen
+     4    3   Generalstreik
+#
+BLOCK 1
+     0   Ein Schnaps, den Tobi gerne trinkt:
+     1   24   Birne
+     2   13   Kirsche
+     3    8   Zwetschge
+     4    3   Mirabelle
+#
+BLOCK 2
+     0   Etwas was die Braut heute trägt:
+     1   27   Hochzeitskleid
+     2    9   Schuhe
+     3    5   Unterwäsche
+     4    4   Strumpfband
+#
+BLOCK 3
+     0   Ein Urlaubsland von Tobi und Corry:
+     1   21   Italien
+     2   11   Deutschland
+     3    7   Österreich
+     4    5   Tunesien
+#
+BLOCK 4
+     0  Bekannte Persönlichkeit aus Öschingen: 
+     1   12   Corrina Schmid
+     2    9   Martin Speidel
+     3    8   Hans Klett
+     4    5   Ste
+#
+BLOCK 5
+     0   Etwas was man dem Brautpaar wünscht:
+     1   21   Gottes Segen
+     2   10   Viel Glück
+     3    9   Alles Gute
+     4    6   Gesundheit
+#

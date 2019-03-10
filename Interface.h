@@ -37,8 +37,6 @@ class Interface {
     //read the next substring in str that is not a whitespace and
     //store the position of the substring in pos
     std::string readNextString(std::string str, std::size_t *pos);
-    //store every substring in a vector
-    std::vector<std::string> strToVec(std::string str);
   
     //the content of a Interface block
     std::vector< std::vector<std::string> > block;

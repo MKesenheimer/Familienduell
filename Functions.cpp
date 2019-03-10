@@ -1,4 +1,5 @@
 #include "Functions.h"
+#include <algorithm>
 
 void strToChar(const std::string tmp, char (&chars)[1024]) {
     strncpy(chars, tmp.c_str(), sizeof(chars));

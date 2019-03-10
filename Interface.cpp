@@ -64,7 +64,9 @@ std::string Interface::getMatrixEntry(std::string blockname, int n, int m) {
 void Interface::readBlock(std::string blockname) {
     file.clear();
     file.seekg(0, std::ios::beg);
+    //std::cout<<"blockname = "<<blockname<<std::endl;
     blockname = finalizeString(blockname);
+    //std::cout<<"finalized blockname = "<<blockname<<std::endl;
     std::vector<std::string> blockContent;
 
     //loop over lines
@@ -77,29 +79,31 @@ void Interface::readBlock(std::string blockname) {
         std::size_t pos = line.find("BLOCK");
         if(pos!=std::string::npos) {
             //search line for blockname
-            if(line.find(blockname)!=std::string::npos) {
-                //std::cout<<keyword<<std::endl;
-                //now we are at the beginning of the block
-                bool inblock = true;
-                do {
-                    //read the next line
-                    std::getline(file, line);
-                    //the block is terminated with '#', ' '
-                    //or with the next keyword
-                    std::size_t pos1 = line.find("BLOCK");
-                    std::size_t pos2 = line.find("END");
-                    if(line=="#" or line==" " or line=="" or
-                       pos1!=std::string::npos or pos2!=std::string::npos) {
-                        inblock = false;
-                    } else {
-                        line = finalizeString(line);
-                        //fill blockContent if line is not empty
-                        if(line!="") {
-                            //std::cout<<line<<std::endl;
-                            blockContent.push_back(line);
+            std::vector<std::string> lineVec = strToVec(line);
+            if(lineVec.size()!=0) {
+                if(lineVec[0].find("BLOCK")!=std::string::npos and blockname.compare(lineVec[1])==0) {
+                    //now we are at the beginning of the block
+                    bool inblock = true;
+                    do {
+                        //read the next line
+                        std::getline(file, line);
+                        //the block is terminated with '#', ' '
+                        //or with the next keyword
+                        std::size_t pos1 = line.find("BLOCK");
+                        std::size_t pos2 = line.find("END");
+                        if(line=="#" or line==" " or line=="" or
+                            pos1!=std::string::npos or pos2!=std::string::npos) {
+                            inblock = false;
+                        } else {
+                            line = finalizeString(line);
+                            //fill blockContent if line is not empty
+                            if(line!="") {
+                                //std::cout<<line<<std::endl;
+                                blockContent.push_back(line);
+                            }
                         }
-                    }
-                } while(inblock and !file.eof());
+                    } while(inblock and !file.eof());
+                }
             }
         }
     }
@@ -109,22 +113,6 @@ void Interface::readBlock(std::string blockname) {
         std::vector<std::string> entry = strToVec(blockContent[i]);
         block.push_back(entry);
     }
-}
-
-std::vector<std::string> Interface::strToVec(std::string str) {
-    //extract the entries (ignore whitespaces)
-    std::vector<std::string> entry;
-    std::string strcopy = str;
-    std::size_t pos = 0;
-    while(pos!=std::string::npos) {
-        std::string temp = readNextString(strcopy, &pos);
-        //delete this string in blockContent[i]
-        if(temp!="") {
-            strcopy = strcopy.substr(pos+temp.length());
-            entry.push_back(temp);
-        }
-    }
-    return entry;
 }
 
 std::string Interface::readNextString(std::string str, std::size_t *pos) {

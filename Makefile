@@ -57,7 +57,7 @@ FRM = -framework SDL2 -framework SDL2_image -framework SDL2_gfx -framework SDL2_
 ## Linker files
 
 ### USER Files ###
-USER = Familienduell.a Interface.a Functions.a Timer.a
+USER = Familienduell.a Interface.a Functions.a Timer.a Functions.a
 
 ########################################################################
 ## Rules

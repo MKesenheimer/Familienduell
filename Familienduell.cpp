@@ -28,8 +28,8 @@
  */
 
  //TODO, verallgemeinern!
-const int NUMBER_OF_QUESTIONS = 3;
-const int NUMBER_OF_ANSWERS = 5;
+const int NUMBER_OF_QUESTIONS = 14;
+const int NUMBER_OF_ANSWERS = 4;
 
 using namespace::std;
 
@@ -237,7 +237,7 @@ int main(int argc, char* args[]) {
                                 showEnd = false;
                                 showPigs = false;
                             }
-                            if(commandVec[0].compare("end") == 0) {
+                            if(commandVec[0].compare("end") == 0 || commandVec[0].compare("quit") == 0 || commandVec[0].compare("exit") == 0) {
                                 Mix_PlayMusic(mix_intro, 1);
                                 currentQuestion = NUMBER_OF_QUESTIONS;
                                 showEnd = true;
@@ -282,6 +282,11 @@ int main(int argc, char* args[]) {
                                     } else if(nWrongB>=3 and nWrongA<3) {
                                         pointsA += points;
                                         points = 0;
+                                    }
+                                //this is for testing purpose only (to check the text, not the functionality)
+                                } else if(commandVec[1].compare("all") == 0) {
+                                    for(int i=1; i<=NUMBER_OF_ANSWERS; i++) {
+                                        showAnswer[i] = true;
                                     }
                                 }
                             }
@@ -616,6 +621,20 @@ int main(int argc, char* args[]) {
         }
         
         if(showEnd) {
+        
+            textMain = "Vielen Dank fürs Mitmachen!";
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                        2*width/NUMBER_OF_COLUMNS, 2*height/NUMBER_OF_LINES);
+            /*
+            textMain = "Gottes Segen und";
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                        2*width/NUMBER_OF_COLUMNS, 4*height/NUMBER_OF_LINES);
+            textMain = "ein gutes neues Jahr!";
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                        2*width/NUMBER_OF_COLUMNS, 6*height/NUMBER_OF_LINES);
+            */
+            
+            /*
             textMain = "Alles Gute!";
             renderText(textMain, "lazy.ttf", colorGreen, 2*height/NUMBER_OF_LINES, rendererMain, 
                         2*width/NUMBER_OF_COLUMNS, 2*height/NUMBER_OF_LINES);
@@ -637,6 +656,7 @@ int main(int argc, char* args[]) {
             textMain = "David, Sissi, Sarah und Matthias";
             renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
                         2.5*width/NUMBER_OF_COLUMNS, 10*height/NUMBER_OF_LINES);
+            */
                         
             //Werbung
             textMain = "(C++ Code frei erhältlich unter https://github.com/MKesenheimer/Familienduell)";
