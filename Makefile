@@ -6,7 +6,7 @@ COMPILER = g++
 
 ########################################################################
 ## Flags
-FLAGS   = -g -std=c++11
+FLAGS   = -g -std=c++17
 LDFLAGS =
 PREPRO  =
 ##verbose level 1
