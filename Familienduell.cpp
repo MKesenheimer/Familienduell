@@ -195,7 +195,7 @@ int main(int argc, char* args[]) {
                             selectCommand = history.size();
 							
                             if (commandVec[0].compare("help") == 0) {
-								const int nlines = 13;
+								const int nlines = 12;
 								if (nlines > NUMBER_OF_LINES_TERMINAL - 1) {
 									std::cout << "Error: increase NUMBER_OF_LINES_TERMINAL." << std::endl;
 									return -1;
@@ -224,7 +224,7 @@ int main(int argc, char* args[]) {
                             }
 							//std::cout << "textTerminal = " << textTerminal.size() << ", currentLine = " << currentLine << std::endl;
 							
-                            //no command selection
+                            // no command selection
                             if (commandVec[0].compare("fullscreen") == 0) {
                                 toggleFullscreen(windowMain, rendererMain);
                                 SDL_RaiseWindow(windowTerminal);
