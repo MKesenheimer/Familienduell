@@ -16,100 +16,93 @@
 # hinter einem '#' steht wird vom Programm ignoriert.
 #
 BLOCK 0
-     0  Ein Tier, das auf dem Bauernhof lebt:
-     1   25   Kuh
-     2    3   Huhn
-     3    3   Katze
-     4    2   Schwein
+     0  Was trägst Du immer bei Dir? 
+     1    7   Schlüssel(bund)
+     2    5   Handy
+     3    3   Ehering
+     4    3   Uhr
 #
 BLOCK 1
-     0   Eine gelbe Frucht:
-     1   19   Banane
-     2   16   Zitrone
-     3    1   Gelbe Rübe
-     4    1   Mango
+     0   Automarke des Brautpaars in 10 Jahr.:
+     1    9   BMW
+     2    6   Mercedes Benz
+     3    3   Audi
+     4    2   VW
 #
 BLOCK 2
-     0   Ein Hobby von dir:
-     1   16   Musik
-     2   14   Sport
-     3    4   Lesen
-     4    2   Basteln
+     0   Dein Lieblingsmärchen:
+     1    6   Schneewittchen
+     2    3   Der gestiefelte Kater
+     3    2   Die Schöne und das Biest
+     4    2   Dornröschen
 #
 BLOCK 3
-     0   Das schönste Blechblasinstrument:
-     1   13   Posaune
-     2   11   Trompete
-     3    9   Horn
-     4    3   Euphonium
+     0   Was verbindest Du mit dem Begriff Hochzeit:
+     1   10   Liebe
+     2    3   Treue
+     3    3   Freude
+     4    3   Zusammenhalt
 #
 BLOCK 4
-     0   Dein Lieblingsgericht:
-     1    6   Pizza
-     2    5   Linsen mit Spätzle
-     3    4   Spaghetti
-     4    4   Lasagne
+     0   Ein Lebensmittel, das Chiara nicht mag:
+     1    9   Käse
+     2    3   Kohlgemüse
+     3    2   Bohnen
+     4    1   Banane
 #
 BLOCK 5
-     0   Eine Automarke: 
-     1   10   Audi
-     2    7   BMW
-     3    6   VW
-     4    6   Mercedes
+     0   Ein Lebensmittel, das Raphi nicht mag: 
+     1    6   Rosenkohl
+     2    5   Zucchini
+     3    2   Pilze
+     4    1   Algen
 #
 BLOCK 6
-     0   Etwas, wofür Mössingen bekannt ist:
-     1   20   Blumen
-     2    5   Bergrutsch
-     3    3   Schnaps
-     4    3   Streuobstwiesen
+     0   Das bei Schneiders meistgetrunkene Getränk:
+     1   10   Wasser
+     2    7   Cola
+     3    2   Apfelsaft
+     4    2   Red Bull
 #
 BLOCK 7
-     0    Dein Lieblingsgetränk:
-     1    8   Kaffee
-     2    7   Bier
-     3    5   Cola
-     4    5   Saftschorle
+     0    Etwas, wofür Bietenhausen bekannt ist:
+     1    5   Diasporahaus
+     2    2   Die Familie in der Bußstraße
+     3    2   Kläranlage
+     4    2   Ruhe
 #
 BLOCK 8
-     0   Gegenstände in der Probe:
-     1   15   Notenständer
-     2    6   Noten
-     3    4   Notentasche
-     4    3   Mundstück
+     0   Ein Hobby von Dir:
+     1    8   Musik
+     2    6   Sport
+     3    2   Fernsehen
+     4    2   Tiere
 #
 BLOCK 9
-     0   Dein Lieblingsweihnachtslied:
-     1   11   Ich steh an deiner Krippe hier
-     2    7   Tochter Zion
-     3    5   Oh du fröhliche
-     4    2   Macht hoch die Tür
+     0   Chiaras Wunschhaarfarbe:
+     1    9   schwarz
+     2    5   blond
+     3    4   braun
+     4    3   rot
 #
 BLOCK 10
-     0   Dein Lieblingsheft:
-     1   10   Choralfantasien
-     2    5   BLM 2013
-     3    5   Bläserklänge
-     4    2   Das Einblasheft
+     0   Raphis Haarfarbe in seiner Jugend:
+     1   10   blond
+     2    6   schwarz
+     3    5   grün
+     4    2   blau
 #
 BLOCK 11
-     0   Einen Schnaps, den du gerne trinkst:
-     1   10   Kirsche
-     2    8   Birne
-     3    7   keinen
-     4    2   Mirabelle
+     0   Raphis häufigstes Werkzeug:
+     1   13   Zange
+     2    3   Schraubenzieher
+     3    2   Meterstab
+     4    2   Cutter
 #
 BLOCK 12
-     0   Eigenschaft eines Dirigenten:
-     1   16   Geduld
-     2    7   Nerven
-     3    3   Taktgefühl
-     4    2   Humor
-#
-BLOCK 13
-     0   Oft gespielte Komponisten:
-     1   18   Johann S. Bach
-     2    9   Christian Sprenger
-     3    3   Nonnenmann
-     4    2   Michael Schütz
+     0   Tier, vor dem Chiara Angst hat:
+     1   16   Spinne
+     2    3   Schlange
+     3    2   Elefant
+     4    1   Krokodil
 #

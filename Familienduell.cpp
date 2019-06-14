@@ -27,77 +27,96 @@
  * void foo(int const (&bar)[2]); // by const-reference
  */
 
- //TODO, verallgemeinern!
-const size_t NUMBER_OF_QUESTIONS = 14;
-const size_t NUMBER_OF_ANSWERS = 4;
-
-using namespace::std;
+ // TODO, verallgemeinern oder aus Datei lesen!
+constexpr size_t NUMBER_OF_QUESTIONS = 13;
+constexpr size_t NUMBER_OF_ANSWERS = 4;
 
 int main(int argc, char* args[]) {
-    //load the questions and the answers
+
+    // load the questions && the answers
     Interface interface("Fragen.txt");
     
-    //the textures we want to render
+    // the textures we want to render
     SDL_Texture *texture = NULL;
     SDL_Texture *image = NULL;
     
-    //The text that's going to be used
+    // The text that's going to be used
     std::vector<std::string> textTerminal;
     std::vector<std::string> history;
     textTerminal.push_back("fd> ");
     size_t currentLine = 0;
     size_t selectCommand = 0;
-    string textMain = " ";
+    std::string textMain(" ");
     SDL_Color colorGreen = {173, 200, 0, 255};
     SDL_Color colorWhite = {255, 255, 255, 255};
     SDL_Color colorBlack = {20, 20, 20, 255};
-    //Initialize SDL_ttf
+	
+    // Initialize SDL_ttf
     if (TTF_Init() != 0) {
         std::cout << "Error in TTF_Init" << std::endl;
-        return 1;
+        return -1;
     }
 
-	//Start up SDL and make sure it went ok
+	// Start up SDL && make sure it went ok
 	if (SDL_Init(SDL_INIT_EVERYTHING) != 0) {
 		std::cout << "Error in SDL_Init" << std::endl;
-		return 1;
+		return -1;
 	}
     
-    //initialize audio
+    // initialize audio
     int flags = MIX_INIT_MP3;
     if (flags != Mix_Init(MIX_INIT_MP3)) {
         std::cout << "Error in Mix_init" << std::endl;
-        return 1;
+        return -1;
     }
     Mix_OpenAudio(22050, AUDIO_S16SYS, 2, 640);
     Mix_Music *mix_intro = Mix_LoadMUS("intro.mp3");
     Mix_Music *mix_wrong = Mix_LoadMUS("wrong.mp3");
     Mix_Music *mix_reveal = Mix_LoadMUS("reveal.mp3");
     
-    //Setup our window and renderer, this is the public screen
-    SDL_Window *windowTerminal = SDL_CreateWindow("Familienduell", SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED, TERMINAL_WIDTH, TERMINAL_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+    // Setup our windows, this is the public screen
 	SDL_Window *windowMain = SDL_CreateWindow("Familienduell", SDL_WINDOWPOS_CENTERED,
-			SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
-	if (windowMain == NULL || windowTerminal == NULL){
-		std::cout << "Error in CreateWindow" << std::endl;
+		SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+	if (windowMain == NULL) {
+		std::cout << "Error in CreateWindow (Public screen)" << std::endl;
 		SDL_Quit();
-		return 1;
+		return -1;
 	}
-    SDL_Renderer *rendererTerminal = SDL_CreateRenderer(windowTerminal, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	
+	// this is the (for the audience invisible) terminal screen
+	SDL_Window *windowTerminal = SDL_CreateWindow("Familienduell", SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED, TERMINAL_WIDTH, TERMINAL_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+	if (windowTerminal == NULL) {
+		std::cout << "Error in CreateWindow (Terminal)" << std::endl;
+		SDL_Quit();
+		return -1;
+	}
+	
+	// Setup renderer, public screen
 	SDL_Renderer *rendererMain = SDL_CreateRenderer(windowMain, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (rendererMain == NULL || rendererTerminal == NULL){
-		std::cout << "Error in CreateRenderer" << std::endl;
+	if (rendererMain == NULL) {
+		std::cout << "Error in CreateRenderer (Public screen)" << std::endl;
+		cleanup(windowMain);
+		SDL_Quit();
+		return -1;
+	}
+	
+	// terminal screen
+    SDL_Renderer *rendererTerminal = SDL_CreateRenderer(windowTerminal, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	if (rendererTerminal == NULL) {
+		std::cout << "Error in CreateRenderer (Terminal)" << std::endl;
 		cleanup(windowMain);
         cleanup(windowTerminal);
 		SDL_Quit();
-		return 1;
+		return -1;
 	}
+	
+	// auxiliary options
     SDL_RaiseWindow(windowTerminal);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(rendererMain, SCREEN_WIDTH, SCREEN_HEIGHT);
     
-    //Gamelogic
+    // Gamelogic
     bool showSplash = true;
     bool showMain = false;
     bool showEnd = false;
@@ -109,28 +128,29 @@ int main(int argc, char* args[]) {
     bool showAnswer[NUMBER_OF_ANSWERS+1];
     for (size_t i = 0; i <= NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
     int pointsA = 0, pointsB = 0, points = 0;
-    //number of wrong answers
+	
+    // number of wrong answers
     int nWrongA = 0, nWrongB = 0;
-    //the group which won the first question and has now the current turn
+	
+	// the group which won the first question && has now the current turn
     std::string currentGroup = "A";
-    //Timer zum festlegen der FPS
+	
+	// Timer zum festlegen der FPS
 	Timer fps;
     Timer worldtime;
     worldtime.start();
-    //number of frame
-	int frame = 0;
     
-    //For tracking if we want to quit
+    // For tracking if we want to quit
 	bool quit = false;
     while(!quit){
-        //start text input
+        // start text input
         SDL_StartTextInput();
-        //start the fps timer
+        // start the fps timer
         fps.start();
-        //Our event structure
+        // Our event structure
         SDL_Event e;
         
-        //get the current display mode
+        // get the current display mode
         int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
         SDL_GetWindowSize(windowMain, &width, &height);
         //std::cout << width << ", " << height << std::endl;
@@ -140,6 +160,7 @@ int main(int argc, char* args[]) {
             case SDL_QUIT:
                 quit = true;
                 break;
+				
             case SDL_KEYDOWN:
                 SDL_RaiseWindow(windowTerminal);
                 switch(e.key.keysym.sym) {
@@ -147,27 +168,42 @@ int main(int argc, char* args[]) {
                     toggleFullscreen(windowMain, rendererMain);
                     SDL_RaiseWindow(windowTerminal);
                     break;
+					
+				//if end of terminal reached, erase first element (scrolling)
                 case SDLK_RETURN:
-                    //if end of terminal reached, erase first element
-                    if (currentLine > 14) {
+                    if (currentLine >= NUMBER_OF_LINES_TERMINAL - 1) {
                         textTerminal.erase(textTerminal.begin());
-                        currentLine = 14;
+                        currentLine = NUMBER_OF_LINES_TERMINAL - 2;
                     }
                     textTerminal.push_back("fd> ");
+					//std::cout << "textTerminal = " << textTerminal.size() << ", currentLine = " << currentLine << std::endl;
+					
                     //handle terminal commands
                     if (currentLine >= 0) {
                         std::string temp(textTerminal[currentLine]);
                         std::vector<std::string> commandVec;
-                        if (temp.length()>4) {
+						
+                        if (temp.length() > 4) {
                             temp = temp.substr(4, temp.length());
                             history.push_back(temp);
+							
                             //split command into multiple strings
                             commandVec = strToVec(temp);
                             for (size_t i = 0; i < commandVec.size(); i++) {
                                 std::cout << commandVec[i] << std::endl;
                             }
                             selectCommand = history.size();
+							
                             if (commandVec[0].compare("help") == 0) {
+								const int nlines = 13;
+								if (nlines > NUMBER_OF_LINES_TERMINAL - 1) {
+									std::cout << "Error: increase NUMBER_OF_LINES_TERMINAL." << std::endl;
+									return -1;
+								}
+								//std::cout << "n = " << ((textTerminal.size() + nlines) - NUMBER_OF_LINES_TERMINAL) << std::endl;
+								// delete lines, if the help message would otherwise not fit
+								if (textTerminal.size() + nlines > NUMBER_OF_LINES_TERMINAL)
+									textTerminal.erase(textTerminal.begin(), textTerminal.begin() + ((textTerminal.size() + nlines) - NUMBER_OF_LINES_TERMINAL));
                                 textTerminal.push_back(" fullscreen");
                                 textTerminal.push_back(" exit");
                                 textTerminal.push_back(" next");
@@ -178,35 +214,46 @@ int main(int argc, char* args[]) {
                                 textTerminal.push_back(" reveal <# of answer>");
                                 textTerminal.push_back(" hide   <# of answer>");
                                 textTerminal.push_back(" display <text>");
+								textTerminal.push_back(" back");
                                 textTerminal.push_back("fd> ");
-                                currentLine += 11;
+                                currentLine += nlines;
+								// constrict the pointer to currentLine
+								if (currentLine >= NUMBER_OF_LINES_TERMINAL - 1) {
+									currentLine = NUMBER_OF_LINES_TERMINAL - 2;
+								}
                             }
+							//std::cout << "textTerminal = " << textTerminal.size() << ", currentLine = " << currentLine << std::endl;
+							
                             //no command selection
                             if (commandVec[0].compare("fullscreen") == 0) {
                                 toggleFullscreen(windowMain, rendererMain);
                                 SDL_RaiseWindow(windowTerminal);
                             }
+							
                             if (commandVec[0].compare("exit") == 0) {
                                 quit = true;
                             }
-                            if (commandVec[0].compare("next") == 0 and (showLogo or showMain or showPigs)) {
+							
+                            if (commandVec[0].compare("next") == 0 && (showLogo or showMain or showPigs)) {
                                 showPigs = false;
                                 showMain = true;
                                 if (currentQuestion >= NUMBER_OF_QUESTIONS) currentQuestion = NUMBER_OF_QUESTIONS - 1;
                                 if (!showLogo) {
                                     if (currentQuestion < (NUMBER_OF_QUESTIONS - 1)) {
                                         currentQuestion++;
-                                        //take the points 
-                                        if (currentGroup.compare("A") == 0 and nWrongA < 3) {
+                                        // take the points
+                                        if (currentGroup.compare("A") == 0 && nWrongA < 3) {
                                             pointsA += points;
-                                        } else if (currentGroup.compare("B") == 0 and nWrongB < 3) {
+                                        } else if (currentGroup.compare("B") == 0 && nWrongB < 3) {
                                             pointsB += points;
                                         }
                                         nWrongA = 0; nWrongB = 0;
                                         points = 0;
                                         for (size_t i = 0; i <= NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
-                                    //end of game
-                                    } else {
+                                    }
+									
+									// end of game
+									else {
                                         Mix_PlayMusic(mix_intro, 1);
                                         currentQuestion = NUMBER_OF_QUESTIONS;
                                         showEnd = true;
@@ -216,8 +263,10 @@ int main(int argc, char* args[]) {
                                         showPigs = false;
                                         displayText = false;
                                     }
-                                } else {
-                                    //if the logo is being displayed
+                                }
+								
+								//if the logo is being displayed
+								else {
                                     showEnd = false;
                                     showMain = true;
                                     showSplash = false;
@@ -226,6 +275,7 @@ int main(int argc, char* args[]) {
                                     displayText = false;
                                 }
                             }
+							
                             //the previous command works only in main screen
                             if (commandVec[0].compare("previous") == 0) {
                                 if (currentQuestion <= 0) currentQuestion = 0;
@@ -242,6 +292,7 @@ int main(int argc, char* args[]) {
                                     showEnd = false;
                                 }
                             }
+							
                             if (commandVec[0].compare("start") == 0) {
                                 Mix_PlayMusic(mix_intro, 1);
                                 showLogo =true;
@@ -251,6 +302,7 @@ int main(int argc, char* args[]) {
                                 showEnd = false;
                                 showPigs = false;
                             }
+							
                             if (commandVec[0].compare("end") == 0 || commandVec[0].compare("quit") == 0) {
                                 Mix_PlayMusic(mix_intro, 1);
                                 currentQuestion = NUMBER_OF_QUESTIONS;
@@ -261,59 +313,70 @@ int main(int argc, char* args[]) {
                                 showPigs = false;
                                 displayText = false;
                             }
+							
                             if (commandVec[0].compare("set") == 0) {
                                 if (commandVec[1].compare("A") == 0 or commandVec[1].compare("B") == 0) {
                                     currentGroup = commandVec[1];
                                 }
                             }
+							
                             if (commandVec[0].compare("reveal") == 0) {
                                 if (is_number(commandVec[1])) {
                                     std::string::size_type sz;
                                     size_t n = static_cast<size_t>(std::stoi(commandVec[1], &sz));
-                                    if (n > 0 and n <= NUMBER_OF_ANSWERS and (nWrongA < 3 or nWrongB < 3) and !showAnswer[n]) {
+                                    if (n > 0 && n <= NUMBER_OF_ANSWERS && (nWrongA < 3 or nWrongB < 3) && !showAnswer[n]) {
                                         Mix_PlayMusic(mix_reveal, 1);
                                         showAnswer[n] = true;
                                         points += interface.getAnswerPoints(currentQuestion,n);
                                     }
+									
                                     //if the group has (correctly) revealed all the answers, set showAnswer[0] to true
                                     showAnswer[0] = true;
                                     for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                                         if (!showAnswer[i]) showAnswer[0] = false;
                                     }
+									
                                     //take the points
-                                    if (showAnswer[0] and currentGroup.compare("A") == 0 and nWrongA < 3) {
+                                    if (showAnswer[0] && currentGroup.compare("A") == 0 && nWrongA < 3) {
                                         pointsA += points;
                                         points = 0;
-                                    } else if (showAnswer[0] and currentGroup.compare("B") == 0 and nWrongB < 3) {
+                                    }
+									else if (showAnswer[0] && currentGroup.compare("B") == 0 && nWrongB < 3) {
                                         pointsB += points;
                                         points = 0;
                                     }
+									
                                     //if group A has three wrong answers, it's group B's turn
                                     //if group B (correctly) reveals one answer, they steal the points of group A
-                                    if (nWrongA >= 3 and nWrongB < 3) {
+                                    if (nWrongA >= 3 && nWrongB < 3) {
                                         pointsB += points;
                                         points = 0;
-                                    } else if (nWrongB >= 3 and nWrongA < 3) {
+                                    }
+									else if (nWrongB >= 3 && nWrongA < 3) {
                                         pointsA += points;
                                         points = 0;
                                     }
-                                //this is for testing purpose only (to check the text, not the functionality)
-                                } else if (commandVec[1].compare("all") == 0) {
+                                }
+								
+								//this is for testing purpose only (to check the text, not the functionality)
+								else if (commandVec[1].compare("all") == 0) {
                                     for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                                         showAnswer[i] = true;
                                     }
                                 }
                             }
+							
                             if (commandVec[0].compare("hide") == 0) {
                                 if (is_number(commandVec[1])) {
                                     std::string::size_type sz;
                                     size_t n = static_cast<size_t>(std::stoi(commandVec[1], &sz));
-                                    if (n > 0 and n <= NUMBER_OF_ANSWERS and (nWrongA < 3 or nWrongB < 3)) {
+                                    if (n > 0 && n <= NUMBER_OF_ANSWERS && (nWrongA < 3 or nWrongB < 3)) {
                                         showAnswer[n] = false;
                                         points -= interface.getAnswerPoints(currentQuestion,n);
                                     }
                                 }
                             }
+							
                             if (commandVec[0].compare("restart") == 0) {
                                 showSplash = true;
                                 showLogo = false;
@@ -327,8 +390,9 @@ int main(int argc, char* args[]) {
                                 nWrongA = 0; nWrongB = 0;
                                 showEnd = false;
                             }
-                            //only possible in main
-                            if (showMain and commandVec[0].compare("display") == 0) {
+							
+                            // only possible in main
+                            if (showMain && commandVec[0].compare("display") == 0) {
                                 if (temp.length() > 8) {
                                     dText = temp.substr(8, temp.length());
                                     displayText = true;
@@ -339,8 +403,9 @@ int main(int argc, char* args[]) {
                                     showPigs = false;
                                 }
                             }
-                            //only possible in main
-                            if (showMain and commandVec[0].compare("pigs") == 0) {
+							
+                            // only possible in main
+                            if (showMain && commandVec[0].compare("pigs") == 0) {
                                 displayText = false;
                                 showSplash = false;
                                 showMain = false;
@@ -348,7 +413,8 @@ int main(int argc, char* args[]) {
                                 showLogo = false;
                                 showPigs = true;
                             }
-                            if ((displayText or showPigs) and commandVec[0].compare("back") == 0) {
+							
+                            if ((displayText or showPigs) && commandVec[0].compare("back") == 0) {
                                 dText = "";
                                 displayText = false;
                                 showSplash = false;
@@ -357,15 +423,16 @@ int main(int argc, char* args[]) {
                                 showLogo = false;
                                 showPigs = false;
                             }
-                            if (showMain and (commandVec[0].compare("wrong") == 0 || commandVec[0].compare("false") == 0)) {
-                                if (currentGroup.compare("A") == 0 and commandVec[1].compare("A") == 0) {
+							
+                            if (showMain && (commandVec[0].compare("wrong") == 0 || commandVec[0].compare("false") == 0)) {
+                                if (currentGroup.compare("A") == 0 && commandVec[1].compare("A") == 0) {
                                     nWrongA += 1;
                                     if (nWrongA >= 3) {
                                         nWrongA = 3;
                                         currentGroup = "B";
                                     }
                                     Mix_PlayMusic(mix_wrong, 1);
-                                } else if (currentGroup.compare("B") == 0 and commandVec[1].compare("B") == 0) {
+                                } else if (currentGroup.compare("B") == 0 && commandVec[1].compare("B") == 0) {
                                     nWrongB += 1;
                                     if (nWrongB >= 3) {
                                         nWrongB = 3;
@@ -373,11 +440,12 @@ int main(int argc, char* args[]) {
                                     }
                                     Mix_PlayMusic(mix_wrong, 1);
                                 }
-                                if (nWrongB >= 3 and nWrongA >= 3) {
+                                if (nWrongB >= 3 && nWrongA >= 3) {
                                     points = 0;
                                 }
                             }
-                            if (showMain and commandVec[0].compare("add") == 0) {
+							
+                            if (showMain && commandVec[0].compare("add") == 0) {
                                 if (commandVec[1].compare("A") == 0) {
                                     if (is_number(commandVec[2])) {
                                         std::string::size_type sz;
@@ -395,7 +463,8 @@ int main(int argc, char* args[]) {
                                     }
                                 }
                             }
-                            if (showMain and commandVec[0].compare("sub") == 0) {
+							
+                            if (showMain && commandVec[0].compare("sub") == 0) {
                                 if (commandVec[1].compare("A") == 0) {
                                     if (is_number(commandVec[2])) {
                                         std::string::size_type sz;
@@ -415,42 +484,50 @@ int main(int argc, char* args[]) {
                             }
                         }
                     }
+					
                     currentLine++;
                     break;
+					
                 case SDLK_UP:
-                    selectCommand--;
-                    if (history.size() > 0 and selectCommand >= 0) {
+					if (selectCommand > 0) selectCommand--;
+                    if (selectCommand >= 0 && history.size() > 0) {
                         textTerminal[currentLine] = "fd> " + history[selectCommand];
                     } else {
                         selectCommand = 0;
                     }
                     break;
+					
                 case SDLK_DOWN:
                     selectCommand++;
-                    if (selectCommand <= history.size()) {
+                    if (selectCommand < history.size()) {
                         textTerminal[currentLine] = "fd> " + history[selectCommand];
                     } else {
                         selectCommand = history.size();
                     }
                     break;
+					
                 case SDLK_BACKSPACE:
                     std::string temp = textTerminal[currentLine];
                     if (temp.length() > 4) {
                         textTerminal[currentLine] = temp.substr(0, temp.length() - 1);
                     }
                     break;
+					
                 }
                 break;
+				
             case SDL_TEXTINPUT:
                 //Add new text onto the end of our text
                 textTerminal[currentLine].append(e.text.text);
                 break;
+				
             case SDL_TEXTEDITING:
                 //Update the composition text.
                 //Update the cursor position.
                 //Update the selection length (if any).
                 //text.append(event.edit.text);
                 break;
+				
             case SDL_WINDOWEVENT:
                 switch(e.window.event) {
                 case SDL_WINDOWEVENT_RESIZED:
@@ -462,19 +539,20 @@ int main(int argc, char* args[]) {
                 }
             }
         }
-        //Rendering
+		
+        // Rendering
         SDL_RenderClear(rendererTerminal);
         SDL_RenderClear(rendererMain);
         
-        //Draw the background grey
+        // Draw the background grey
         boxRGBA(rendererMain, 0, 0, width, height, 20, 20, 20, 255);
         
-        //render terminal text
+        // render terminal text
         for (size_t i = 0; i < textTerminal.size(); i++) {
-            renderText(textTerminal[i].c_str(), "monaco.ttf", colorWhite, 28, rendererTerminal, 0, i*35);
+            renderText(textTerminal[i].c_str(), "monaco.ttf", colorWhite, 28, rendererTerminal, 0, i * static_cast<int>(TERMINAL_HEIGHT / NUMBER_OF_LINES_TERMINAL));
         }
         
-        //start screen
+        // start screen
         if (showSplash) {
             textMain = "Familienduell";
             renderText(textMain, "lazy.ttf", colorGreen, 2.7*height/NUMBER_OF_LINES, rendererMain, 
@@ -485,14 +563,14 @@ int main(int argc, char* args[]) {
                         1*height/NUMBER_OF_LINES, rendererMain, 6*width/NUMBER_OF_COLUMNS, 7*height/NUMBER_OF_LINES);
         }
 
+		//play tingle && show logo
         if (showLogo) {
-            //play tingle and show logo
             image = IMG_LoadTexture(rendererMain, "logo.png");
             renderTexture(image, rendererMain, 0, 0, width, height);
         }
-        
+		
+		//display pigs
         if (showPigs) {
-            //display pigs
             image = IMG_LoadTexture(rendererMain, "pigs.png");
             renderTexture(image, rendererMain, 0, 0, width, height);
         }
@@ -532,7 +610,9 @@ int main(int argc, char* args[]) {
                     boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
                             2.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 }
-            } else if (currentGroup.compare("B") == 0) {
+            }
+			
+			else if (currentGroup.compare("B") == 0) {
                 if (pointsB >= 1000) {
                     boxRGBA(rendererMain, 14.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
                             19.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
@@ -556,7 +636,7 @@ int main(int argc, char* args[]) {
                 }
             }
             
-            //show answers and the underlaying layout
+            //show answers && the underlaying layout
             for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                 textMain = std::to_string(i) + "." ;
                 renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
@@ -570,10 +650,10 @@ int main(int argc, char* args[]) {
             
             for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                 if (showAnswer[i]) {
-                    textMain = interface.getAnswer(currentQuestion,i);
+                    textMain = interface.getAnswer(currentQuestion, i);
                     renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
                                 2.5*width/NUMBER_OF_COLUMNS, (1*i+1)*height/NUMBER_OF_LINES);
-                    textMain = std::to_string(interface.getAnswerPoints(currentQuestion,i));
+                    textMain = std::to_string(interface.getAnswerPoints(currentQuestion, i));
                     renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                                 18*width/NUMBER_OF_COLUMNS, (1*i+1)*height/NUMBER_OF_LINES);
                 }
@@ -685,7 +765,6 @@ int main(int argc, char* args[]) {
         SDL_RenderPresent(rendererMain);
         
         //Timer related stuff
-        frame++;
         if (fps.getTicks() < static_cast<int>(1000/FRAMES_PER_SECOND)) {
             SDL_Delay( (1000/FRAMES_PER_SECOND) - fps.getTicks() );
         }
