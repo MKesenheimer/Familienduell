@@ -23,7 +23,7 @@ BLOCK 0
      4    3   Uhr
 #
 BLOCK 1
-     0   Automarke des Brautpaars in 10 Jahr.:
+     0   Auto des Brautpaars in 10 Jahren:
      1    9   BMW
      2    6   Mercedes Benz
      3    3   Audi
@@ -37,35 +37,35 @@ BLOCK 2
      4    2   Dornröschen
 #
 BLOCK 3
-     0   Was verbindest Du mit dem Begriff Hochzeit:
+     0   Was verbindest Du mit Hochzeit:
      1   10   Liebe
      2    3   Treue
      3    3   Freude
      4    3   Zusammenhalt
 #
 BLOCK 4
-     0   Ein Lebensmittel, das Chiara nicht mag:
+     0  Lebensmittel, das Chiara nicht mag:
      1    9   Käse
      2    3   Kohlgemüse
      3    2   Bohnen
      4    1   Banane
 #
 BLOCK 5
-     0   Ein Lebensmittel, das Raphi nicht mag: 
+     0  Lebensmittel, das Raphi nicht mag: 
      1    6   Rosenkohl
      2    5   Zucchini
      3    2   Pilze
      4    1   Algen
 #
 BLOCK 6
-     0   Das bei Schneiders meistgetrunkene Getränk:
+     0   Schneiders meistgetrunkenes Getränk:
      1   10   Wasser
      2    7   Cola
      3    2   Apfelsaft
      4    2   Red Bull
 #
 BLOCK 7
-     0    Etwas, wofür Bietenhausen bekannt ist:
+     0    Wofür ist Bietenhausen bekannt?
      1    5   Diasporahaus
      2    2   Die Familie in der Bußstraße
      3    2   Kläranlage
