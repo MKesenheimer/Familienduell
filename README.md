@@ -6,6 +6,10 @@ Einfache Umsetzung der bekannten Fernsehshow "Familienduell" in C++
 - die Grafikausgabe basiert auf SDL, für alle Betriebssysteme erhältlich unter https://www.libsdl.org/download-2.0.php.
 - eine zusätzliche Bibliothek SDL2_gfx/SDL2_gfxPrimitives muss installiert werden, zu finden unter https://sourceforge.net/projects/sdl2gfx/ oder im Ordner ./Frameworks (für Mac OSX).
 - Gegebenenfalls müssen für das jeweilige Betriebssystem oder für die Art der SDL-Installation die "#include"-Befehle und das Makefile angepasst werden.
+- Installation der SDL Pakete mit einem Paketmanager:
+```
+sudo port install libsdl2 libsdl2_gfx libsdl2_image libsdl2_mixer libsdl2_ttf
+```
 
 # Steuerung:
 Das Spiel wird durch ein Terminal im Hintergrund (nicht sichtbar für das Publikum) gesteuert. Dafür stehen folgende Befehle zur Verfügung:

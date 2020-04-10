@@ -17,7 +17,7 @@
 #
 BLOCK 0
      0  Was trägst Du immer bei Dir? 
-     1    7   Schlüssel(bund)
+     1    7   Schlüssel
      2    5   Handy
      3    3   Ehering
      4    3   Uhr
@@ -25,9 +25,9 @@ BLOCK 0
 BLOCK 1
      0   Auto des Brautpaars in 10 Jahren:
      1    9   BMW
-     2    6   Mercedes Benz
+     2    6   Mercedes
      3    3   Audi
-     4    2   VW
+     4    3   VW
 #
 BLOCK 2
      0   Dein Lieblingsmärchen:
@@ -39,23 +39,23 @@ BLOCK 2
 BLOCK 3
      0   Was verbindest Du mit Hochzeit:
      1   10   Liebe
-     2    3   Treue
+     2    4   Zusammenhalt
      3    3   Freude
-     4    3   Zusammenhalt
+     4    3   Treue
 #
 BLOCK 4
      0  Lebensmittel, das Chiara nicht mag:
      1    9   Käse
      2    3   Kohlgemüse
      3    2   Bohnen
-     4    1   Banane
+     4    2   Meeresfrüchte
 #
 BLOCK 5
      0  Lebensmittel, das Raphi nicht mag: 
      1    6   Rosenkohl
      2    5   Zucchini
-     3    2   Pilze
-     4    1   Algen
+     3    2   Meeresfrüchte
+     4    2   Pilze
 #
 BLOCK 6
      0   Schneiders meistgetrunkenes Getränk:
@@ -66,15 +66,15 @@ BLOCK 6
 #
 BLOCK 7
      0    Wofür ist Bietenhausen bekannt?
-     1    5   Diasporahaus
-     2    2   Die Familie in der Bußstraße
+     1    7   ländlich
+     2    5   Diasporahaus
      3    2   Kläranlage
-     4    2   Ruhe
+     4    2   Familie in der Bußstraße
 #
 BLOCK 8
      0   Ein Hobby von Dir:
      1    8   Musik
-     2    6   Sport
+     2    8   Sport
      3    2   Fernsehen
      4    2   Tiere
 #
@@ -94,15 +94,15 @@ BLOCK 10
 #
 BLOCK 11
      0   Raphis häufigstes Werkzeug:
-     1   13   Zange
+     1   14   Zange
      2    3   Schraubenzieher
-     3    2   Meterstab
-     4    2   Cutter
+     3    2   Cutter
+     4    2   Meterstab
 #
 BLOCK 12
      0   Tier, vor dem Chiara Angst hat:
      1   16   Spinne
-     2    3   Schlange
+     2    5   Kriechtiere
      3    2   Elefant
      4    1   Krokodil
 #

@@ -3,11 +3,11 @@
 #include <sstream>
 #include <vector>
 #define _USE_MATH_DEFINES
-#include <SDL2/SDL.h>
-#include <SDL2_image/SDL_image.h>
-#include <SDL2_gfx/SDL2_gfxPrimitives.h>
-#include <SDL2_ttf/SDL_ttf.h>
-#include "SDL2_mixer/SDL_mixer.h"
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL2_gfxPrimitives.h>
+#include <SDL_ttf.h>
+#include <SDL_mixer.h>
 #include <math.h>
 #include "SDL_Defs.h"
 #include "Interface.h"
@@ -35,11 +35,11 @@ int main(int argc, char* args[]) {
 
     // load the questions && the answers
     Interface interface("Fragen.txt");
-    
+
     // the textures we want to render
     SDL_Texture *texture = NULL;
     SDL_Texture *image = NULL;
-    
+
     // The text that's going to be used
     std::vector<std::string> textTerminal;
     std::vector<std::string> history;
@@ -50,7 +50,7 @@ int main(int argc, char* args[]) {
     SDL_Color colorGreen = {173, 200, 0, 255};
     SDL_Color colorWhite = {255, 255, 255, 255};
     SDL_Color colorBlack = {20, 20, 20, 255};
-	
+
     // Initialize SDL_ttf
     if (TTF_Init() != 0) {
         std::cout << "Error in TTF_Init" << std::endl;
@@ -62,7 +62,7 @@ int main(int argc, char* args[]) {
 		std::cout << "Error in SDL_Init" << std::endl;
 		return -1;
 	}
-    
+
     // initialize audio
     int flags = MIX_INIT_MP3;
     if (flags != Mix_Init(MIX_INIT_MP3)) {
@@ -73,7 +73,7 @@ int main(int argc, char* args[]) {
     Mix_Music *mix_intro = Mix_LoadMUS("intro.mp3");
     Mix_Music *mix_wrong = Mix_LoadMUS("wrong.mp3");
     Mix_Music *mix_reveal = Mix_LoadMUS("reveal.mp3");
-    
+
     // Setup our windows, this is the public screen
 	SDL_Window *windowMain = SDL_CreateWindow("Familienduell", SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -82,7 +82,7 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return -1;
 	}
-	
+
 	// this is the (for the audience invisible) terminal screen
 	SDL_Window *windowTerminal = SDL_CreateWindow("Familienduell", SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED, TERMINAL_WIDTH, TERMINAL_HEIGHT, SDL_WINDOW_RESIZABLE | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -91,7 +91,7 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return -1;
 	}
-	
+
 	// Setup renderer, public screen
 	SDL_Renderer *rendererMain = SDL_CreateRenderer(windowMain, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (rendererMain == NULL) {
@@ -100,7 +100,7 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return -1;
 	}
-	
+
 	// terminal screen
     SDL_Renderer *rendererTerminal = SDL_CreateRenderer(windowTerminal, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (rendererTerminal == NULL) {
@@ -110,12 +110,12 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return -1;
 	}
-	
+
 	// auxiliary options
     SDL_RaiseWindow(windowTerminal);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(rendererMain, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
+
     // Gamelogic
     bool showSplash = true;
     bool showMain = false;
@@ -128,18 +128,18 @@ int main(int argc, char* args[]) {
     bool showAnswer[NUMBER_OF_ANSWERS+1];
     for (size_t i = 0; i <= NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
     int pointsA = 0, pointsB = 0, points = 0;
-	
+
     // number of wrong answers
     int nWrongA = 0, nWrongB = 0;
-	
+
 	// the group which won the first question && has now the current turn
     std::string currentGroup = "A";
-	
+
 	// Timer zum festlegen der FPS
 	Timer fps;
     Timer worldtime;
     worldtime.start();
-    
+
     // For tracking if we want to quit
 	bool quit = false;
     while(!quit){
@@ -149,18 +149,18 @@ int main(int argc, char* args[]) {
         fps.start();
         // Our event structure
         SDL_Event e;
-        
+
         // get the current display mode
         int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
         SDL_GetWindowSize(windowMain, &width, &height);
         //std::cout << width << ", " << height << std::endl;
-        
+
 		while(SDL_PollEvent(&e)) {
             switch(e.type) {
             case SDL_QUIT:
                 quit = true;
                 break;
-				
+
             case SDL_KEYDOWN:
                 SDL_RaiseWindow(windowTerminal);
                 switch(e.key.keysym.sym) {
@@ -168,7 +168,7 @@ int main(int argc, char* args[]) {
                     toggleFullscreen(windowMain, rendererMain);
                     SDL_RaiseWindow(windowTerminal);
                     break;
-					
+
 				//if end of terminal reached, erase first element (scrolling)
                 case SDLK_RETURN:
                     if (currentLine >= NUMBER_OF_LINES_TERMINAL - 1) {
@@ -177,24 +177,25 @@ int main(int argc, char* args[]) {
                     }
                     textTerminal.push_back("fd> ");
 					//std::cout << "textTerminal = " << textTerminal.size() << ", currentLine = " << currentLine << std::endl;
-					
+
                     //handle terminal commands
                     if (currentLine >= 0) {
                         std::string temp(textTerminal[currentLine]);
                         std::vector<std::string> commandVec;
-						
+
                         if (temp.length() > 4) {
                             temp = temp.substr(4, temp.length());
                             history.push_back(temp);
-							
+
                             //split command into multiple strings
                             commandVec = strToVec(temp);
                             for (size_t i = 0; i < commandVec.size(); i++) {
                                 std::cout << commandVec[i] << std::endl;
                             }
                             selectCommand = history.size();
-							
+
                             if (commandVec[0].compare("help") == 0) {
+								// the number of lines of the help message
 								const int nlines = 12;
 								if (nlines > NUMBER_OF_LINES_TERMINAL - 1) {
 									std::cout << "Error: increase NUMBER_OF_LINES_TERMINAL." << std::endl;
@@ -223,17 +224,17 @@ int main(int argc, char* args[]) {
 								}
                             }
 							//std::cout << "textTerminal = " << textTerminal.size() << ", currentLine = " << currentLine << std::endl;
-							
+
                             // no command selection
                             if (commandVec[0].compare("fullscreen") == 0) {
                                 toggleFullscreen(windowMain, rendererMain);
                                 SDL_RaiseWindow(windowTerminal);
                             }
-							
+
                             if (commandVec[0].compare("exit") == 0) {
                                 quit = true;
                             }
-							
+
                             if (commandVec[0].compare("next") == 0 && (showLogo or showMain or showPigs)) {
                                 showPigs = false;
                                 showMain = true;
@@ -251,7 +252,7 @@ int main(int argc, char* args[]) {
                                         points = 0;
                                         for (size_t i = 0; i <= NUMBER_OF_ANSWERS; i++) showAnswer[i] = false;
                                     }
-									
+
 									// end of game
 									else {
                                         Mix_PlayMusic(mix_intro, 1);
@@ -264,7 +265,7 @@ int main(int argc, char* args[]) {
                                         displayText = false;
                                     }
                                 }
-								
+
 								//if the logo is being displayed
 								else {
                                     showEnd = false;
@@ -275,7 +276,7 @@ int main(int argc, char* args[]) {
                                     displayText = false;
                                 }
                             }
-							
+
                             //the previous command works only in main screen
                             if (commandVec[0].compare("previous") == 0) {
                                 if (currentQuestion <= 0) currentQuestion = 0;
@@ -292,7 +293,7 @@ int main(int argc, char* args[]) {
                                     showEnd = false;
                                 }
                             }
-							
+
                             if (commandVec[0].compare("start") == 0) {
                                 Mix_PlayMusic(mix_intro, 1);
                                 showLogo =true;
@@ -302,7 +303,7 @@ int main(int argc, char* args[]) {
                                 showEnd = false;
                                 showPigs = false;
                             }
-							
+
                             if (commandVec[0].compare("end") == 0 || commandVec[0].compare("quit") == 0) {
                                 Mix_PlayMusic(mix_intro, 1);
                                 currentQuestion = NUMBER_OF_QUESTIONS;
@@ -313,13 +314,13 @@ int main(int argc, char* args[]) {
                                 showPigs = false;
                                 displayText = false;
                             }
-							
+
                             if (commandVec[0].compare("set") == 0) {
                                 if (commandVec[1].compare("A") == 0 or commandVec[1].compare("B") == 0) {
                                     currentGroup = commandVec[1];
                                 }
                             }
-							
+
                             if (commandVec[0].compare("reveal") == 0) {
                                 if (is_number(commandVec[1])) {
                                     std::string::size_type sz;
@@ -329,13 +330,13 @@ int main(int argc, char* args[]) {
                                         showAnswer[n] = true;
                                         points += interface.getAnswerPoints(currentQuestion,n);
                                     }
-									
+
                                     //if the group has (correctly) revealed all the answers, set showAnswer[0] to true
                                     showAnswer[0] = true;
                                     for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                                         if (!showAnswer[i]) showAnswer[0] = false;
                                     }
-									
+
                                     //take the points
                                     if (showAnswer[0] && currentGroup.compare("A") == 0 && nWrongA < 3) {
                                         pointsA += points;
@@ -345,7 +346,7 @@ int main(int argc, char* args[]) {
                                         pointsB += points;
                                         points = 0;
                                     }
-									
+
                                     //if group A has three wrong answers, it's group B's turn
                                     //if group B (correctly) reveals one answer, they steal the points of group A
                                     if (nWrongA >= 3 && nWrongB < 3) {
@@ -357,7 +358,7 @@ int main(int argc, char* args[]) {
                                         points = 0;
                                     }
                                 }
-								
+
 								//this is for testing purpose only (to check the text, not the functionality)
 								else if (commandVec[1].compare("all") == 0) {
                                     for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
@@ -365,7 +366,7 @@ int main(int argc, char* args[]) {
                                     }
                                 }
                             }
-							
+
                             if (commandVec[0].compare("hide") == 0) {
                                 if (is_number(commandVec[1])) {
                                     std::string::size_type sz;
@@ -376,7 +377,7 @@ int main(int argc, char* args[]) {
                                     }
                                 }
                             }
-							
+
                             if (commandVec[0].compare("restart") == 0) {
                                 showSplash = true;
                                 showLogo = false;
@@ -390,7 +391,7 @@ int main(int argc, char* args[]) {
                                 nWrongA = 0; nWrongB = 0;
                                 showEnd = false;
                             }
-							
+
                             // only possible in main
                             if (showMain && commandVec[0].compare("display") == 0) {
                                 if (temp.length() > 8) {
@@ -403,7 +404,7 @@ int main(int argc, char* args[]) {
                                     showPigs = false;
                                 }
                             }
-							
+
                             // only possible in main
                             if (showMain && commandVec[0].compare("pigs") == 0) {
                                 displayText = false;
@@ -413,7 +414,7 @@ int main(int argc, char* args[]) {
                                 showLogo = false;
                                 showPigs = true;
                             }
-							
+
                             if ((displayText or showPigs) && commandVec[0].compare("back") == 0) {
                                 dText = "";
                                 displayText = false;
@@ -423,7 +424,7 @@ int main(int argc, char* args[]) {
                                 showLogo = false;
                                 showPigs = false;
                             }
-							
+
                             if (showMain && (commandVec[0].compare("wrong") == 0 || commandVec[0].compare("false") == 0)) {
                                 if (currentGroup.compare("A") == 0 && commandVec[1].compare("A") == 0) {
                                     nWrongA += 1;
@@ -444,7 +445,7 @@ int main(int argc, char* args[]) {
                                     points = 0;
                                 }
                             }
-							
+
                             if (showMain && commandVec[0].compare("add") == 0) {
                                 if (commandVec[1].compare("A") == 0) {
                                     if (is_number(commandVec[2])) {
@@ -463,7 +464,7 @@ int main(int argc, char* args[]) {
                                     }
                                 }
                             }
-							
+
                             if (showMain && commandVec[0].compare("sub") == 0) {
                                 if (commandVec[1].compare("A") == 0) {
                                     if (is_number(commandVec[2])) {
@@ -484,10 +485,10 @@ int main(int argc, char* args[]) {
                             }
                         }
                     }
-					
+
                     currentLine++;
                     break;
-					
+
                 case SDLK_UP:
 					if (selectCommand > 0) selectCommand--;
                     if (selectCommand >= 0 && history.size() > 0) {
@@ -496,7 +497,7 @@ int main(int argc, char* args[]) {
                         selectCommand = 0;
                     }
                     break;
-					
+
                 case SDLK_DOWN:
                     selectCommand++;
                     if (selectCommand < history.size()) {
@@ -505,29 +506,29 @@ int main(int argc, char* args[]) {
                         selectCommand = history.size();
                     }
                     break;
-					
+
                 case SDLK_BACKSPACE:
                     std::string temp = textTerminal[currentLine];
                     if (temp.length() > 4) {
                         textTerminal[currentLine] = temp.substr(0, temp.length() - 1);
                     }
                     break;
-					
+
                 }
                 break;
-				
+
             case SDL_TEXTINPUT:
                 //Add new text onto the end of our text
                 textTerminal[currentLine].append(e.text.text);
                 break;
-				
+
             case SDL_TEXTEDITING:
                 //Update the composition text.
                 //Update the cursor position.
                 //Update the selection length (if any).
                 //text.append(event.edit.text);
                 break;
-				
+
             case SDL_WINDOWEVENT:
                 switch(e.window.event) {
                 case SDL_WINDOWEVENT_RESIZED:
@@ -539,25 +540,25 @@ int main(int argc, char* args[]) {
                 }
             }
         }
-		
+
         // Rendering
         SDL_RenderClear(rendererTerminal);
         SDL_RenderClear(rendererMain);
-        
+
         // Draw the background grey
         boxRGBA(rendererMain, 0, 0, width, height, 20, 20, 20, 255);
-        
+
         // render terminal text
         for (size_t i = 0; i < textTerminal.size(); i++) {
             renderText(textTerminal[i].c_str(), "monaco.ttf", colorWhite, 28, rendererTerminal, 0, i * static_cast<int>(TERMINAL_HEIGHT / NUMBER_OF_LINES_TERMINAL));
         }
-        
+
         // start screen
         if (showSplash) {
             textMain = "Familienduell";
-            renderText(textMain, "lazy.ttf", colorGreen, 2.7*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 2.7*height/NUMBER_OF_LINES, rendererMain,
                         1*width/NUMBER_OF_COLUMNS, 3*height/NUMBER_OF_LINES);
-            
+
             textMain = "<type start>";
             renderText(textMain, "lazy.ttf", colorGreen, static_cast<int>(worldtime.getTicks()/2.0),
                         1*height/NUMBER_OF_LINES, rendererMain, 6*width/NUMBER_OF_COLUMNS, 7*height/NUMBER_OF_LINES);
@@ -568,74 +569,74 @@ int main(int argc, char* args[]) {
             image = IMG_LoadTexture(rendererMain, "logo.png");
             renderTexture(image, rendererMain, 0, 0, width, height);
         }
-		
+
 		//display pigs
         if (showPigs) {
             image = IMG_LoadTexture(rendererMain, "pigs.png");
             renderTexture(image, rendererMain, 0, 0, width, height);
         }
-        
+
         //main screen
         if (showMain) {
             textMain = interface.getQuestion(currentQuestion);
             renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                         1*width/NUMBER_OF_COLUMNS, 0*height/NUMBER_OF_LINES);
-            
+
             //draw line
             lineRGBA(rendererMain, 0, 1.5*height/NUMBER_OF_LINES, width, 1.5*height/NUMBER_OF_LINES, 173, 200, 0, 255);
-            
+
             //draw bottom box
             boxRGBA(rendererMain, 0, 11*height/NUMBER_OF_LINES, width, height, 173, 200, 0, 200);
-            
+
             //draw a box around the points of current group
             if (currentGroup.compare("A") == 0) {
                 if (pointsA >= 1000) {
-                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             5.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                             5.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 } else if (pointsA >= 100) {
-                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             4.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                             4.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 } else if (pointsA >= 10) {
-                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             3.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                             3.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 } else {
-                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             2.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 0.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                             2.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 }
             }
-			
+
 			else if (currentGroup.compare("B") == 0) {
                 if (pointsB >= 1000) {
-                    boxRGBA(rendererMain, 14.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 14.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             19.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 14.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 14.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                         19.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 } else if (pointsB >= 100) {
-                    boxRGBA(rendererMain, 15.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 15.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             19.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 15.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 15.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                         19.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 } else if (pointsB >= 10) {
-                    boxRGBA(rendererMain, 16.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 16.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             19.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 16.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 16.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                         19.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 } else {
-                    boxRGBA(rendererMain, 17.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 17.2*width/NUMBER_OF_COLUMNS, 11.2*height/NUMBER_OF_LINES,
                             19.8*width/NUMBER_OF_COLUMNS, 12.8*height/NUMBER_OF_LINES, 20, 20, 20, 255);
-                    boxRGBA(rendererMain, 17.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES, 
+                    boxRGBA(rendererMain, 17.3*width/NUMBER_OF_COLUMNS, 11.3*height/NUMBER_OF_LINES,
                         19.7*width/NUMBER_OF_COLUMNS, 12.7*height/NUMBER_OF_LINES, 173, 200, 0, 200);
                 }
             }
-            
+
             //show answers && the underlaying layout
             for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                 textMain = std::to_string(i) + "." ;
@@ -643,28 +644,28 @@ int main(int argc, char* args[]) {
                             1*width/NUMBER_OF_COLUMNS, (1*i+1)*height/NUMBER_OF_LINES);
                 if (!showAnswer[i]) {
                     textMain = "- -" ;
-                    renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                    renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                                 18*width/NUMBER_OF_COLUMNS, (1*i+1)*height/NUMBER_OF_LINES);
                 }
             }
-            
+
             for (size_t i = 1; i <= NUMBER_OF_ANSWERS; i++) {
                 if (showAnswer[i]) {
                     textMain = interface.getAnswer(currentQuestion, i);
-                    renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                    renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                                 2.5*width/NUMBER_OF_COLUMNS, (1*i+1)*height/NUMBER_OF_LINES);
                     textMain = std::to_string(interface.getAnswerPoints(currentQuestion, i));
                     renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                                 18*width/NUMBER_OF_COLUMNS, (1*i+1)*height/NUMBER_OF_LINES);
                 }
             }
-            
+
             //display points
             //Group A
             textMain = std::to_string(pointsA);
             renderText(textMain, "lazy.ttf", colorBlack, 1.5*height/NUMBER_OF_LINES, rendererMain,
                         1*width/NUMBER_OF_COLUMNS, 11*height/NUMBER_OF_LINES);
-            
+
             //Group B
             textMain = std::to_string(pointsB);
             if (pointsB >= 1000) {
@@ -680,23 +681,23 @@ int main(int argc, char* args[]) {
                 renderText(textMain, "lazy.ttf", colorBlack, 1.5*height/NUMBER_OF_LINES, rendererMain,
                             18*width/NUMBER_OF_COLUMNS, 11*height/NUMBER_OF_LINES);
             }
-            
+
             //point of each turn (the points can get stolen, if the group has three wrong answers)
             textMain = "Summe: ";
-            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                         12*width/NUMBER_OF_COLUMNS, 8*height/NUMBER_OF_LINES);
             textMain = std::to_string(points);
             if (points >= 100) {
-                renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                             17*width/NUMBER_OF_COLUMNS, 8*height/NUMBER_OF_LINES);
             } else if (points >= 10) {
-                renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                             17.5*width/NUMBER_OF_COLUMNS, 8*height/NUMBER_OF_LINES);
             } else {
-                renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+                renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                             18*width/NUMBER_OF_COLUMNS, 8*height/NUMBER_OF_LINES);
             }
-            
+
             //display x for wrong answers
             if (nWrongA > 0 or nWrongB > 0) {
                 image = IMG_LoadTexture(rendererMain, "false.png");
@@ -708,67 +709,67 @@ int main(int argc, char* args[]) {
                 }
             }
         }
-        
+
         //display text on screen
         if (displayText) {
             textMain = dText;
-            renderText(textMain, "lazy.ttf", colorGreen, 3*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 3*height/NUMBER_OF_LINES, rendererMain,
                         1*width/NUMBER_OF_COLUMNS, 3*height/NUMBER_OF_LINES);
         }
-        
+
         if (showEnd) {
-        
+
             textMain = "Vielen Dank fürs Mitmachen!";
-            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                         2*width/NUMBER_OF_COLUMNS, 2*height/NUMBER_OF_LINES);
             /*
             textMain = "Gottes Segen und";
-            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                         2*width/NUMBER_OF_COLUMNS, 4*height/NUMBER_OF_LINES);
             textMain = "ein gutes neues Jahr!";
-            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 1*height/NUMBER_OF_LINES, rendererMain,
                         2*width/NUMBER_OF_COLUMNS, 6*height/NUMBER_OF_LINES);
             */
-            
+
             /*
             textMain = "Alles Gute!";
-            renderText(textMain, "lazy.ttf", colorGreen, 2*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 2*height/NUMBER_OF_LINES, rendererMain,
                         2*width/NUMBER_OF_COLUMNS, 2*height/NUMBER_OF_LINES);
             textMain = "wünschen euch:";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain,
                         2.5*width/NUMBER_OF_COLUMNS, 5*height/NUMBER_OF_LINES);
             textMain = "Jenny, Matze, Kadda, Johannes,";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain,
                         2.5*width/NUMBER_OF_COLUMNS, 6*height/NUMBER_OF_LINES);
             textMain = "Sabby, Toby, Damaris, Dennis, Kerstin,";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain,
                         2.5*width/NUMBER_OF_COLUMNS, 7*height/NUMBER_OF_LINES);
             textMain = "Felix, Simon, Teresa, Simi, Benni,";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain,
                         2.5*width/NUMBER_OF_COLUMNS, 8*height/NUMBER_OF_LINES);
             textMain = "Thessy, Benni, Ute, Salome, Manu,";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain,
                         2.5*width/NUMBER_OF_COLUMNS, 9*height/NUMBER_OF_LINES);
             textMain = "David, Sissi, Sarah und Matthias";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.8*height/NUMBER_OF_LINES, rendererMain,
                         2.5*width/NUMBER_OF_COLUMNS, 10*height/NUMBER_OF_LINES);
             */
-                        
+
             //Werbung
             textMain = "(C++ Code frei erhältlich unter https://github.com/MKesenheimer/Familienduell)";
-            renderText(textMain, "lazy.ttf", colorGreen, 0.4*height/NUMBER_OF_LINES, rendererMain, 
+            renderText(textMain, "lazy.ttf", colorGreen, 0.4*height/NUMBER_OF_LINES, rendererMain,
                         2*width/NUMBER_OF_COLUMNS, 12*height/NUMBER_OF_LINES);
         }
-        
+
         //apply to the screen
         SDL_RenderPresent(rendererTerminal);
         SDL_RenderPresent(rendererMain);
-        
+
         //Timer related stuff
         if (fps.getTicks() < static_cast<int>(1000/FRAMES_PER_SECOND)) {
             SDL_Delay( (1000/FRAMES_PER_SECOND) - fps.getTicks() );
         }
-    
+
         SDL_StopTextInput();
     }
 

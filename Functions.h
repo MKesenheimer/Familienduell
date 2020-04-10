@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include <vector>
-#include <SDL2/SDL.h>
-#include <SDL2_image/SDL_image.h>
-#include <SDL2_gfx/SDL2_gfxPrimitives.h>
-#include <SDL2_ttf/SDL_ttf.h>
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL2_gfxPrimitives.h>
+#include <SDL_ttf.h>
 #include "SDL_Defs.h"
 
 void strToChar(const std::string tmp, char (&chars)[1024]);

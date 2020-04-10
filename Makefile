@@ -34,12 +34,18 @@ vpath %.cpp $(WORKINGDIR)
 vpath %.m $(WORKINGDIR)
 vpath %.a $(WORKINGDIR)/build
 vpath %.o $(WORKINGDIR)/build
-FINCLUDE = /Library/Frameworks/
 
 ########################################################################
 ## Includes
-CXX  = $(COMPILER) $(FLAGS) $(OPT) $(WARN) $(DEBUG) $(PREPRO) -I$(WORKINGDIR) -F$(FINCLUDE)
+CXX  = $(COMPILER) $(FLAGS) $(OPT) $(WARN) $(DEBUG) $(PREPRO) -I$(WORKINGDIR)
 INCLUDE = $(wildcard *.h $(UINCLUDE)/*.h)
+
+########################################################################
+## SDL
+CXX += $(shell sdl2-config --cflags)
+LDFLAGS += $(shell sdl2-config --static-libs) -lSDL2_gfx -lSDL2_image -lSDL2_mixer -lSDL2_ttf
+
+########################################################################
 
 %.a: %.cpp $(INCLUDE)
 	$(CXX) -c -o build/$@ $<
@@ -51,7 +57,7 @@ INCLUDE = $(wildcard *.h $(UINCLUDE)/*.h)
 LIB = -lncurses
 
 # Frameworks
-FRM = -framework SDL2 -framework SDL2_image -framework SDL2_gfx -framework SDL2_ttf -framework SDL2_mixer -framework Cocoa
+FRM = -framework Cocoa
 
 ########################################################################
 ## Linker files
